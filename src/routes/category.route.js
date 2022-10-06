@@ -18,4 +18,7 @@ router.put('/:tournament_id/category/:id', categoryController.updateCategory);
 // delete category
 router.delete('/:tournament_id/category/:id',categoryController.deleteCategory);
 
+// draw category match
+router.post('/:tournament_id/category/:id/draw',categoryController.drawCategory);
+
 module.exports = router;

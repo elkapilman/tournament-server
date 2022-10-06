@@ -11,7 +11,7 @@ const Category = function (category) {
 };
 
 // get all categories
-Category.getAllCategorys = (tournament_id, result) => {
+Category.getAllCategories = (tournament_id, result) => {
   dbConn.query(
     `SELECT categories.id, categories.name, categories.system, categories.system_name, categories.tatami_id, tatamis.name AS tatami, categories.created_at, categories.updated_at 
     FROM categories

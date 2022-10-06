@@ -1,8 +1,11 @@
 const CategoryModel = require("../models/category.model");
+const CompetitorModel = require("../models/competitor.model");
+const MatchModel = require("../models/match.model");
+const MatchController = require("../controllers/match.controller");
 
 // get all category list
 exports.getCategoryList = (req, res) => {
-  CategoryModel.getAllCategorys(req.params.tournament_id, (err, categories) => {
+  CategoryModel.getAllCategories(req.params.tournament_id, (err, categories) => {
     if (err) res.send(err);
     res.send(categories);
   });
@@ -49,10 +52,14 @@ exports.updateCategory = (req, res) => {
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
     res.send(400).send({ success: false, message: "Please fill all fields" });
   } else {
-    CategoryModel.updateCategory(req.params.id, categoryReqData, (err, category) => {
-      if (err) res.send(err);
-      res.json({ status: true, message: "Category updated Successfully" });
-    });
+    CategoryModel.updateCategory(
+      req.params.id,
+      categoryReqData,
+      (err, category) => {
+        if (err) res.send(err);
+        res.json({ status: true, message: "Category updated Successfully" });
+      }
+    );
   }
 };
 
@@ -61,5 +68,48 @@ exports.deleteCategory = (req, res) => {
   CategoryModel.deleteCategory(req.params.id, (err, category) => {
     if (err) res.send(err);
     res.json({ success: true, message: "Category deleted successully!" });
+  });
+};
+
+// draw category
+exports.drawCategory = (req, res) => {
+  const draw = (data) => {
+    const result = [];
+    for (let i = 0; i < data.length; i += 1) {
+      for (let j = i + 1; j < data.length; j += 1) {
+        console.log(`${data[i].id} vs ${data[j].id}`);
+        result.push({
+          tournament_id: req.params.tournament_id,
+          category_id: req.params.id,
+          competitor1_id: data[i].id,
+          competitor2_id: data[j].id,
+        });
+      }
+    }
+    return result;
+  };
+
+  CompetitorModel.getCompetitorByCategory(req.params.id, (err, competitor) => {
+    console.log("err", err)
+    if (err) res.send(err);
+    console.log("banyak", competitor.length);
+    if (competitor.length < 2)
+      res.status(400).send({ success: false, message: "Minimum 2 Competitor" });
+    // console.log(competitor);
+    const request = draw(competitor);
+    console.log(request);
+    MatchModel.createMatches(request, (errMatch, match) => {
+      console.log("errMatch", errMatch)
+      if (errMatch) {
+        res.send(errMatch);
+      } else {
+        res.json({
+          status: true,
+          message: "Match Created Successfully",
+          data: match.insertId,
+        });
+      }
+    });
+    // res.send(competitor);
   });
 };

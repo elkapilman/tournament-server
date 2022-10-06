@@ -41,6 +41,18 @@ Competitor.getCompetitorByID = (id, result) => {
   });
 };
 
+// get competitor by ID from DB
+Competitor.getCompetitorByCategory = (category_id, result) => {
+  dbConn.query("SELECT * FROM competitors WHERE category_id=? AND is_deleted=0", category_id, (err, res) => {
+    if (err) {
+      console.log("Error while fetching competitor by category_id", err);
+      result(null, err);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
 // create new competitor
 Competitor.createCompetitor = (competitorReqData, result) => {
   dbConn.query("INSERT INTO competitors SET ? ", competitorReqData, (err, res) => {

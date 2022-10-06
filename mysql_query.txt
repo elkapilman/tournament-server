@@ -1,4 +1,4 @@
-CREATE DATABASE node_mysql_crud_db;
+CREATE DATABASE tournament;
 
 CREATE  TABLE IF NOT EXISTS `employees` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT,
@@ -17,6 +17,75 @@ CREATE  TABLE IF NOT EXISTS `employees` (
 ENGINE = InnoDB;
 
 
-INSERT INTO `node_mysql_crud_db`.`employees` (`first_name`, `last_name`, `email`, `phone`, `organization`, `designation`, `salary`, `status`, `is_deleted`, `created_at`) VALUES ('John', 'Doe', 'johndoe@gmail.com', '1234567890', 'Microsoft', 'Full Stack Developer', '50000.00', '1', '0', STR_TO_DATE('18/02/2019 11:15:45','%d/%m/%Y %H:%i:%s'));
+INSERT INTO `tournament`.`employees` (`first_name`, `last_name`, `email`, `phone`, `organization`, `designation`, `salary`, `status`, `is_deleted`, `created_at`) VALUES ('John', 'Doe', 'johndoe@gmail.com', '1234567890', 'Microsoft', 'Full Stack Developer', '50000.00', '1', '0', STR_TO_DATE('18/02/2019 11:15:45','%d/%m/%Y %H:%i:%s'));
 
-INSERT INTO `node_mysql_crud_db`.`employees` (`first_name`, `last_name`, `email`, `phone`, `organization`, `designation`, `salary`, `status`, `is_deleted`, `created_at`) VALUES ('Jane', 'Doe', 'janedoe@gmail.com', '9876543210', 'Google', 'Software Engineer', '44500.00', '1', '0', '2020-18-07 15:30:30');
+INSERT INTO `tournament`.`employees` (`first_name`, `last_name`, `email`, `phone`, `organization`, `designation`, `salary`, `status`, `is_deleted`, `created_at`) VALUES ('Jane', 'Doe', 'janedoe@gmail.com', '9876543210', 'Google', 'Software Engineer', '44500.00', '1', '0', STR_TO_DATE('18/02/2019 11:15:45','%d/%m/%Y %H:%i:%s'));
+
+
+
+
+CREATE  TABLE IF NOT EXISTS `athletes` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `tournaments` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `tatami` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `tournament_id` BIGINT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `categories` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `tournament_id` BIGINT NOT NULL,
+  `tatami_id` BIGINT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `system` VARCHAR(255) NOT NULL,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `competitors` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `tournament_id` BIGINT NOT NULL,
+  `category_id` BIGINT NOT NULL,
+  `athlete_id` BIGINT NOT NULL,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS `matches` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT,
+  `tournament_id` BIGINT NOT NULL,
+  `category_id` BIGINT NOT NULL,
+  `competitor1_id` BIGINT NOT NULL,
+  `competitor2_id` BIGINT NOT NULL,
+  `started_at` DATETIME NOT NULL,
+  `competitor1_point` TINYINT UNSIGNED DEFAULT 0,
+  `competitor2_point` TINYINT UNSIGNED DEFAULT 0,
+  `is_deleted` TINYINT UNSIGNED DEFAULT 0,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;

@@ -16,6 +16,14 @@ exports.getCompetitorByID = (req, res) => {
   });
 };
 
+// get competitor by category
+exports.getCompetitorByCategory = (req, res) => {
+  CompetitorModel.getCompetitorByCategory(req.params.category_id, (err, competitor) => {
+    if (err) res.send(err);
+    res.send(competitor);
+  });
+};
+
 // create new competitor
 exports.createNewCompetitor = (req, res) => {
   const request = {
