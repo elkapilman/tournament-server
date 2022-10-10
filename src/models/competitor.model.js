@@ -8,15 +8,21 @@ const Competitor = function (competitor) {
   this.updated_at = new Date();
 };
 
-// get all competitors
-Competitor.getAllCompetitors = (tournament_id, result) => {
+// get competitors
+Competitor.getCompetitors = (tournament_id, filter, result) => {
+  const queryParams = [];
+  const querySet = [];
+  Object.keys(filter).forEach((param) => {
+    querySet.push(`AND competitors.${param}=?`);
+    queryParams.push(filter[param]);
+  });
   dbConn.query(
-    `SELECT competitors.id, competitors.name, competitors.category_id, categories.name AS category, competitors.created_at, competitors.updated_at 
+    `SELECT competitors.id, competitors.name, competitors.category_id, categories.name AS category, categories.gender AS category_gender, competitors.created_at, competitors.updated_at 
     FROM competitors
     LEFT JOIN categories
     ON competitors.category_id = categories.id
-    WHERE competitors.is_deleted=0 AND categories.is_deleted=0 AND competitors.tournament_id=?`,
-    tournament_id,
+    WHERE competitors.is_deleted=0 AND categories.is_deleted=0 AND competitors.tournament_id=? ${querySet.join("")}`,
+    [tournament_id, ...queryParams],
     (err, res) => {
       if (err) {
         console.log("Error while fetching competitors", err);

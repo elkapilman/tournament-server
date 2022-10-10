@@ -1,8 +1,8 @@
 const CompetitorModel = require("../models/competitor.model");
 
-// get all competitor list
+// get competitor list
 exports.getCompetitorList = (req, res) => {
-  CompetitorModel.getAllCompetitors(req.params.tournament_id, (err, competitors) => {
+  CompetitorModel.getCompetitors(req.params.tournament_id, req.query, (err, competitors) => {
     if (err) res.send(err);
     res.send(competitors);
   });
