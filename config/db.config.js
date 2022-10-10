@@ -9,9 +9,9 @@ const dbConn = mysql.createConnection({
     database: 'tournament'
 });
 
-dbConn.connect(function(error){
-    if(error) throw error;
-    console.log('Database Connected Successfully!!!');
-})
+// dbConn.connect(function(error){
+//     if(error) throw error;
+//     console.log('Database Connected Successfully!!!');
+// })
 
 module.exports = dbConn;
