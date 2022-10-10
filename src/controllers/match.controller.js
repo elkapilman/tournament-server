@@ -1,8 +1,8 @@
 const MatchModel = require("../models/match.model");
 
-// get all match list
+// get match list
 exports.getMatchList = (req, res) => {
-  MatchModel.getAllMatches(req.params.tournament_id, (err, matches) => {
+  MatchModel.getMatches(req.params.tournament_id, req.query, (err, matches) => {
     if (err) res.send(err);
     res.send(matches);
   });

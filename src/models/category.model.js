@@ -3,9 +3,8 @@ const dbConn = require("../../config/db.config");
 const Category = function (category) {
   this.tournament_id = category.tournament_id;
   this.name = category.name;
-  this.tatami_id = category.tatami_id;
-  this.system = category.system;
-  this.system_name = category.system_name;
+  this.draw_id = category.draw_id;
+  this.gender = category.gender;
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -13,11 +12,9 @@ const Category = function (category) {
 // get all categories
 Category.getAllCategories = (tournament_id, result) => {
   dbConn.query(
-    `SELECT categories.id, categories.name, categories.system, categories.system_name, categories.tatami_id, tatamis.name AS tatami, categories.created_at, categories.updated_at 
+    `SELECT *
     FROM categories
-    LEFT JOIN tatamis
-    ON categories.tatami_id = tatamis.id
-    WHERE categories.is_deleted=0 AND tatamis.is_deleted=0 AND categories.tournament_id=?`,
+    WHERE is_deleted=0 AND categories.tournament_id=?`,
     tournament_id,
     (err, res) => {
       if (err) {
@@ -58,10 +55,15 @@ Category.createCategory = (categoryReqData, result) => {
 
 // update category
 Category.updateCategory = (id, categoryReqData, result) => {
-  const { name, tatami_id, system, system_name } = categoryReqData;
+  const querySet = [];
+  const queryParam = [];
+  Object.keys(categoryReqData).forEach((matchParam) => {
+    querySet.push(`${matchParam}=?`);
+    queryParam.push(categoryReqData[matchParam]);
+  });
   dbConn.query(
-    "UPDATE categories SET name=?,tatami_id=?,system=?,system_name=? WHERE id = ?",
-    [name, tatami_id, system, system_name, id],
+    `UPDATE categories SET ${querySet.join(",")} WHERE id = ?`,
+    [...queryParam, id],
     (err, res) => {
       if (err) {
         console.log("Error while updating the category");

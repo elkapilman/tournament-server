@@ -73,11 +73,35 @@ exports.deleteCategory = (req, res) => {
 
 // draw category
 exports.drawCategory = (req, res) => {
+  const categoryReqData = {
+    draw_id: 1,
+  }
+  CategoryModel.updateCategory(
+    req.params.id,
+    categoryReqData,
+    (err, category) => {
+      if (err) res.send(err);
+      MatchModel.createMatches(req.body, (errMatch, match) => {
+        if (errMatch) {
+          res.send(errMatch);
+        } else {
+          res.json({
+            status: true,
+            message: "Match Created Successfully",
+            data: match.insertId,
+          });
+        }
+      });
+    }
+  );
+};
+
+// To be deleted??
+exports.drawCategoryByAPI = (req, res) => {
   const draw = (data) => {
     const result = [];
     for (let i = 0; i < data.length; i += 1) {
       for (let j = i + 1; j < data.length; j += 1) {
-        console.log(`${data[i].id} vs ${data[j].id}`);
         result.push({
           tournament_id: req.params.tournament_id,
           category_id: req.params.id,
@@ -90,16 +114,13 @@ exports.drawCategory = (req, res) => {
   };
 
   CompetitorModel.getCompetitorByCategory(req.params.id, (err, competitor) => {
-    console.log("err", err)
     if (err) res.send(err);
     console.log("banyak", competitor.length);
     if (competitor.length < 2)
       res.status(400).send({ success: false, message: "Minimum 2 Competitor" });
     // console.log(competitor);
     const request = draw(competitor);
-    console.log(request);
     MatchModel.createMatches(request, (errMatch, match) => {
-      console.log("errMatch", errMatch)
       if (errMatch) {
         res.send(errMatch);
       } else {
@@ -112,4 +133,20 @@ exports.drawCategory = (req, res) => {
     });
     // res.send(competitor);
   });
+};
+
+
+// reset match category
+exports.resetMatchCategory = (req, res) => {
+  const categoryReqData = {
+    draw_id: 0,
+  }
+  CategoryModel.updateCategory(
+    req.params.id,
+    categoryReqData,
+    (err, category) => {
+      if (err) res.send(err);
+        res.json({ status: true, message: "Match category reset Successfully" });
+    }
+  );
 };

@@ -19,21 +19,35 @@ const Match = function (match) {
   this.updated_at = new Date();
 };
 
-// get all matches
-Match.getAllMatches = (tournament_id, result) => {
+// get matches
+Match.getMatches = (tournament_id, filter, result) => {
+  const queryParams = [];
+  const querySet = [];
+  Object.keys(filter).forEach((param) => {
+    querySet.push(`AND matches.${param}=?`);
+    queryParams.push(filter[param]);
+  });
   dbConn.query(
-    `SELECT matches.id, matches.category_id, categories.name AS category,
-    matches.competitor1_id, matches.competitor2_id,
+    `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
+    matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
+    tatami.name AS tatami_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
+    matches.default_time, matches.system, matches.player_win,
     matches.time, matches.is_start, matches.is_reset,
     matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
     matches.created_at, matches.updated_at 
     FROM matches
     LEFT JOIN categories
     ON matches.category_id = categories.id
-    WHERE matches.is_deleted=0 AND categories.is_deleted=0 AND matches.tournament_id=?`,
-    tournament_id,
+    LEFT JOIN competitors comp1
+    ON matches.competitor1_id = comp1.id
+    LEFT JOIN competitors comp2
+    ON matches.competitor2_id = comp2.id
+    LEFT JOIN tatamis tatami
+    ON matches.tatami_id = tatami.id
+    WHERE matches.is_deleted=0 AND categories.is_deleted=0 AND matches.tournament_id=? ${querySet.join("")}`,
+    [tournament_id, ...queryParams],
     (err, res) => {
       if (err) {
         console.log("Error while fetching matches", err);
@@ -49,10 +63,11 @@ Match.getAllMatches = (tournament_id, result) => {
 // get match by ID from DB
 Match.getMatchByID = (id, result) => {
   dbConn.query(
-    `SELECT matches.id, matches.category_id, categories.name AS category,
+    `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
     matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
+    matches.default_time, matches.system, matches.player_win,
     matches.time, matches.is_start, matches.is_reset,
     matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
     matches.created_at, matches.updated_at  
