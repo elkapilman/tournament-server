@@ -3,9 +3,9 @@ const CompetitorModel = require("../models/competitor.model");
 const MatchModel = require("../models/match.model");
 const MatchController = require("../controllers/match.controller");
 
-// get all category list
+// get category list
 exports.getCategoryList = (req, res) => {
-  CategoryModel.getAllCategories(req.params.tournament_id, (err, categories) => {
+  CategoryModel.getCategories(req.params.tournament_id, req.query, (err, categories) => {
     if (err) res.send(err);
     res.send(categories);
   });

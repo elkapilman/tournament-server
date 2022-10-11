@@ -10,12 +10,18 @@ const Category = function (category) {
 };
 
 // get all categories
-Category.getAllCategories = (tournament_id, result) => {
+Category.getCategories = (tournament_id, filter, result) => {
+  const queryParams = [];
+  const querySet = [];
+  Object.keys(filter).forEach((param) => {
+    querySet.push(`AND categories.${param}=?`);
+    queryParams.push(filter[param]);
+  });
   dbConn.query(
     `SELECT *
     FROM categories
-    WHERE is_deleted=0 AND categories.tournament_id=?`,
-    tournament_id,
+    WHERE is_deleted=0 AND categories.tournament_id=? ${querySet.join("")}`,
+    [tournament_id, ...queryParams],
     (err, res) => {
       if (err) {
         console.log("Error while fetching categories", err);

@@ -30,7 +30,7 @@ Match.getMatches = (tournament_id, filter, result) => {
   dbConn.query(
     `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
     matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
-    tatami.name AS tatami_name,
+    tatami.id AS tatami_id, tatami.name AS tatami_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
     matches.default_time, matches.system, matches.player_win,
@@ -46,7 +46,9 @@ Match.getMatches = (tournament_id, filter, result) => {
     ON matches.competitor2_id = comp2.id
     LEFT JOIN tatamis tatami
     ON matches.tatami_id = tatami.id
-    WHERE matches.is_deleted=0 AND categories.is_deleted=0 AND matches.tournament_id=? ${querySet.join("")}`,
+    WHERE matches.is_deleted=0 AND categories.is_deleted=0 AND matches.tournament_id=? ${querySet.join(
+      ""
+    )}`,
     [tournament_id, ...queryParams],
     (err, res) => {
       if (err) {
@@ -65,6 +67,7 @@ Match.getMatchByID = (id, result) => {
   dbConn.query(
     `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
     matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
+    tatami.id AS tatami_id, tatami.name AS tatami_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
     matches.default_time, matches.system, matches.player_win,
@@ -78,6 +81,8 @@ Match.getMatchByID = (id, result) => {
     ON matches.competitor1_id = comp1.id
     LEFT JOIN competitors comp2
     ON matches.competitor2_id = comp2.id
+    LEFT JOIN tatamis tatami
+    ON matches.tatami_id = tatami.id
     WHERE matches.is_deleted=0 AND categories.is_deleted=0 AND matches.id=?`,
     id,
     (err, res) => {
