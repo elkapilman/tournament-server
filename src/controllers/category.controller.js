@@ -1,14 +1,20 @@
 const CategoryModel = require("../models/category.model");
 const CompetitorModel = require("../models/competitor.model");
 const MatchModel = require("../models/match.model");
+const DrawModel = require("../models/draw.model");
 const MatchController = require("../controllers/match.controller");
+const Draw = require("../models/draw.model");
 
 // get category list
 exports.getCategoryList = (req, res) => {
-  CategoryModel.getCategories(req.params.tournament_id, req.query, (err, categories) => {
-    if (err) res.send(err);
-    res.send(categories);
-  });
+  CategoryModel.getCategories(
+    req.params.tournament_id,
+    req.query,
+    (err, categories) => {
+      if (err) res.send(err);
+      res.send(categories);
+    }
+  );
 };
 
 // get category by ID
@@ -73,27 +79,44 @@ exports.deleteCategory = (req, res) => {
 
 // draw category
 exports.drawCategory = (req, res) => {
-  const categoryReqData = {
-    draw_id: 1,
-  }
-  CategoryModel.updateCategory(
-    req.params.id,
-    categoryReqData,
-    (err, category) => {
-      if (err) res.send(err);
-      MatchModel.createMatches(req.body, (errMatch, match) => {
-        if (errMatch) {
-          res.send(errMatch);
-        } else {
-          res.json({
-            status: true,
-            message: "Match Created Successfully",
-            data: match.insertId,
-          });
-        }
-      });
-    }
-  );
+  const drawRequest = {
+    system: req.body.system,
+    tournament_id: req.params.tournament_id,
+    category_id: req.params.id,
+  };
+  const drawReqData = new DrawModel(drawRequest);
+  DrawModel.createDraw(drawReqData, (errDraw, draw) => {
+    if (errDraw) res.send(errDraw);
+    const categoryReqData = {
+      draw_id: draw.insertId,
+    };
+    CategoryModel.updateCategory(
+      req.params.id,
+      categoryReqData,
+      (err, category) => {
+        if (err) res.send(err);
+        const matchRequest = req.body.matches.map((match, index) => {
+          console.log();
+          return {
+            ...match,
+            draw_id: draw.insertId,
+            order_id: `${draw.insertId}.${index + 1}`,
+          };
+        });
+        MatchModel.createMatches(matchRequest, (errMatch, match) => {
+          if (errMatch) {
+            res.send(errMatch);
+          } else {
+            res.json({
+              status: true,
+              message: "Match Created Successfully",
+              data: match.insertId,
+            });
+          }
+        });
+      }
+    );
+  });
 };
 
 // To be deleted??
@@ -135,18 +158,17 @@ exports.drawCategoryByAPI = (req, res) => {
   });
 };
 
-
 // reset match category
 exports.resetMatchCategory = (req, res) => {
   const categoryReqData = {
     draw_id: 0,
-  }
+  };
   CategoryModel.updateCategory(
     req.params.id,
     categoryReqData,
     (err, category) => {
       if (err) res.send(err);
-        res.json({ status: true, message: "Match category reset Successfully" });
+      res.json({ status: true, message: "Match category reset Successfully" });
     }
   );
 };

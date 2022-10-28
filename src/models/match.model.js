@@ -2,7 +2,7 @@ const dbConn = require("../../config/db.config");
 
 const Match = function (match) {
   this.tournament_id = match.tournament_id;
-  this.category_id = match.category_id;
+  this.draw_id = match.draw_id;
   this.competitor1_id = match.competitor1_id;
   this.competitor2_id = match.competitor2_id;
   this.competitor1_point = match.competitor1_point;
@@ -28,18 +28,23 @@ Match.getMatches = (tournament_id, filter, result) => {
     queryParams.push(filter[param]);
   });
   dbConn.query(
-    `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
+    `SELECT matches.id, matches.draw_id,
+    categories.name AS category, categories.gender AS category_gender,
+    draw.category_id, draw.system,
     matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
     tatami.id AS tatami_id, tatami.name AS tatami_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
-    matches.default_time, matches.system, matches.player_win,
+    matches.default_time, matches.player_win,
     matches.time, matches.is_start, matches.is_reset,
-    matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
+    matches.time_lock, matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
+    matches.match_id, matches.next_match_id, matches.is_match, matches.round, matches.next_match_player, matches.state, matches.order_id,
     matches.created_at, matches.updated_at 
     FROM matches
+    LEFT JOIN draw
+    ON matches.draw_id = draw.id
     LEFT JOIN categories
-    ON matches.category_id = categories.id
+    ON draw.id = categories.draw_id
     LEFT JOIN competitors comp1
     ON matches.competitor1_id = comp1.id
     LEFT JOIN competitors comp2
@@ -65,18 +70,23 @@ Match.getMatches = (tournament_id, filter, result) => {
 // get match by ID from DB
 Match.getMatchByID = (id, result) => {
   dbConn.query(
-    `SELECT matches.id, matches.category_id, categories.name AS category, categories.gender AS category_gender,
+    `SELECT matches.id, matches.draw_id,
+    categories.name AS category, categories.gender AS category_gender,
+    draw.category_id, draw.system,
     matches.competitor1_id, matches.competitor2_id, comp1.name AS competitor1_name, comp2.name AS competitor2_name,
     tatami.id AS tatami_id, tatami.name AS tatami_name,
     matches.competitor1_point, matches.competitor2_point,
     matches.competitor1_foul, matches.competitor2_foul,
-    matches.default_time, matches.system, matches.player_win,
+    matches.default_time, matches.player_win,
     matches.time, matches.is_start, matches.is_reset,
-    matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
+    matches.time_lock, matches.player_lock, matches.is_start_lock, matches.is_reset_lock,
+    matches.match_id, matches.next_match_id, matches.is_match, matches.round, matches.next_match_player, matches.state, matches.order_id,
     matches.created_at, matches.updated_at  
     FROM matches
+    LEFT JOIN draw
+    ON matches.draw_id = draw.id
     LEFT JOIN categories
-    ON matches.category_id = categories.id
+    ON draw.id = categories.draw_id
     LEFT JOIN competitors comp1
     ON matches.competitor1_id = comp1.id
     LEFT JOIN competitors comp2
