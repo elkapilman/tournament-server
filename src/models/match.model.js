@@ -15,6 +15,15 @@ const Match = function (match) {
   this.is_start_lock = match.is_start_lock;
   this.is_reset_lock = match.is_reset_lock;
   this.player_lock = match.player_lock;
+  this.default_time = match.default_time;
+  this.tatami_id = match.tatami_id;
+  this.is_match = match.is_match;
+  this.match_id = match.match_id;
+  this.next_match_id = match.next_match_id;
+  this.next_match_player = match.next_match_player;
+  this.round = match.round;
+  this.state = match.state;
+  this.order_id = match.order_id;
   this.created_at = new Date();
   this.updated_at = new Date();
 };

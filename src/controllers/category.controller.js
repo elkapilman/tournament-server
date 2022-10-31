@@ -96,12 +96,11 @@ exports.drawCategory = (req, res) => {
       (err, category) => {
         if (err) res.send(err);
         const matchRequest = req.body.matches.map((match, index) => {
-          console.log();
-          return {
+          return new MatchModel({
             ...match,
             draw_id: draw.insertId,
             order_id: `${draw.insertId}.${index + 1}`,
-          };
+          });
         });
         MatchModel.createMatches(matchRequest, (errMatch, match) => {
           if (errMatch) {
