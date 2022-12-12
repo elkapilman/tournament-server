@@ -25,6 +25,17 @@ exports.getCategoryByID = (req, res) => {
   });
 };
 
+// get category summary
+exports.getCategorySummary = (req, res) => {
+  CategoryModel.getCategorySummary(
+    req.params.tournament_id,
+    (err, categories) => {
+      if (err) res.send(err);
+      res.send(categories);
+    }
+  );
+};
+
 // create new category
 exports.createNewCategory = (req, res) => {
   const request = {

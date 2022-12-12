@@ -46,6 +46,29 @@ Category.getCategoryByID = (id, result) => {
   });
 };
 
+// get category summary
+Category.getCategorySummary = (tournament_id, result) => {
+  dbConn.query(
+    `SELECT cat.id, cat.name, cat.draw_id, cat.gender, COUNT(com.id) AS total_competitor
+    FROM categories cat
+    LEFT JOIN competitors com
+    ON cat.id = com.category_id AND com.is_deleted=0
+    WHERE cat.is_deleted=0 AND cat.tournament_id=?
+    GROUP BY cat.id`,
+    [tournament_id],
+    (err, res) => {
+      if (err) {
+        console.log("Error while fetching categories", err);
+        result(null, err);
+      } else {
+        console.log("res", res);
+        console.log("Categorys fetched successfully");
+        result(null, res);
+      }
+    }
+  );
+};
+
 // create new category
 Category.createCategory = (categoryReqData, result) => {
   dbConn.query("INSERT INTO categories SET ? ", categoryReqData, (err, res) => {
