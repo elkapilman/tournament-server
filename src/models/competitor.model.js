@@ -3,6 +3,9 @@ const dbConn = require("../../config/db.config");
 const Competitor = function (competitor) {
   this.tournament_id = competitor.tournament_id;
   this.name = competitor.name;
+  this.club_id = competitor.club_id;
+  this.gender = competitor.gender;
+  this.birth_date = competitor.birth_date;
   this.category_id = competitor.category_id;
   this.created_at = new Date();
   this.updated_at = new Date();
@@ -17,10 +20,15 @@ Competitor.getCompetitors = (tournament_id, filter, result) => {
     queryParams.push(filter[param]);
   });
   dbConn.query(
-    `SELECT competitors.id, competitors.name, competitors.category_id, categories.name AS category, categories.gender AS category_gender, competitors.created_at, competitors.updated_at 
+    `SELECT competitors.id, competitors.name, competitors.category_id, competitors.club_id, competitors.birth_date, competitors.gender, 
+    categories.name AS category, categories.gender AS category_gender,
+    clubs.name AS club,
+    competitors.created_at, competitors.updated_at 
     FROM competitors
     LEFT JOIN categories
     ON competitors.category_id = categories.id
+    LEFT JOIN clubs
+    ON competitors.club_id = clubs.id
     WHERE competitors.is_deleted=0 AND categories.is_deleted=0 AND competitors.tournament_id=? ${querySet.join("")}`,
     [tournament_id, ...queryParams],
     (err, res) => {
@@ -74,10 +82,15 @@ Competitor.createCompetitor = (competitorReqData, result) => {
 
 // update competitor
 Competitor.updateCompetitor = (id, competitorReqData, result) => {
-  const { name, category_id } = competitorReqData;
+  const querySet = [];
+  const queryParam = [];
+  Object.keys(competitorReqData).forEach((matchParam) => {
+    querySet.push(`${matchParam}=?`);
+    queryParam.push(competitorReqData[matchParam]);
+  });
   dbConn.query(
-    "UPDATE competitors SET name=?,category_id=? WHERE id = ?",
-    [name, category_id, id],
+    `UPDATE competitors SET ${querySet.join(",")} WHERE id = ?`,
+    [...queryParam, id],
     (err, res) => {
       if (err) {
         console.log("Error while updating the competitor");
