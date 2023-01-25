@@ -27,6 +27,7 @@ const categoryRoutes = require('./src/routes/category.route');
 const clubRoutes = require('./src/routes/club.route');
 const competitorRoutes = require('./src/routes/competitor.route');
 const matchRoutes = require('./src/routes/match.route');
+const refereeRoutes = require('./src/routes/referee.route');
 
 app.use('/api/v1/employee', employeeRoutes);
 app.use('/api/v1/tournament', tournamentRoutes);
@@ -35,6 +36,7 @@ app.use('/api/v1/tournament', categoryRoutes);
 app.use('/api/v1/tournament', clubRoutes);
 app.use('/api/v1/tournament', competitorRoutes);
 app.use('/api/v1/tournament', matchRoutes);
+app.use('/api/v1/tournament', refereeRoutes);
 
 // listen to the port
 app.listen(port, ()=>{
