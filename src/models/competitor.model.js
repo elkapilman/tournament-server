@@ -7,6 +7,7 @@ const Competitor = function (competitor) {
   this.gender = competitor.gender;
   this.birth_date = competitor.birth_date;
   this.category_id = competitor.category_id;
+  this.seeding = competitor.seeding;
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -20,7 +21,7 @@ Competitor.getCompetitors = (tournament_id, filter, result) => {
     queryParams.push(filter[param]);
   });
   dbConn.query(
-    `SELECT competitors.id, competitors.name, competitors.category_id, competitors.club_id, competitors.birth_date, competitors.gender, 
+    `SELECT competitors.id, competitors.name, competitors.category_id, competitors.club_id, competitors.birth_date, competitors.gender, competitors.seeding, 
     categories.name AS category, categories.gender AS category_gender,
     clubs.name AS club,
     competitors.created_at, competitors.updated_at 
@@ -29,7 +30,9 @@ Competitor.getCompetitors = (tournament_id, filter, result) => {
     ON competitors.category_id = categories.id
     LEFT JOIN clubs
     ON competitors.club_id = clubs.id
-    WHERE competitors.is_deleted=0 AND categories.is_deleted=0 AND competitors.tournament_id=? ${querySet.join("")}`,
+    WHERE competitors.is_deleted=0 AND categories.is_deleted=0 AND competitors.tournament_id=? ${querySet.join(
+      ""
+    )}`,
     [tournament_id, ...queryParams],
     (err, res) => {
       if (err) {
@@ -57,27 +60,35 @@ Competitor.getCompetitorByID = (id, result) => {
 
 // get competitor by ID from DB
 Competitor.getCompetitorByCategory = (category_id, result) => {
-  dbConn.query("SELECT * FROM competitors WHERE category_id=? AND is_deleted=0", category_id, (err, res) => {
-    if (err) {
-      console.log("Error while fetching competitor by category_id", err);
-      result(null, err);
-    } else {
-      result(null, res);
+  dbConn.query(
+    "SELECT * FROM competitors WHERE category_id=? AND is_deleted=0",
+    category_id,
+    (err, res) => {
+      if (err) {
+        console.log("Error while fetching competitor by category_id", err);
+        result(null, err);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 // create new competitor
 Competitor.createCompetitor = (competitorReqData, result) => {
-  dbConn.query("INSERT INTO competitors SET ? ", competitorReqData, (err, res) => {
-    if (err) {
-      console.log("Error while inserting data");
-      result(null, err);
-    } else {
-      console.log("Competitor created successfully");
-      result(null, res);
+  dbConn.query(
+    "INSERT INTO competitors SET ? ",
+    competitorReqData,
+    (err, res) => {
+      if (err) {
+        console.log("Error while inserting data");
+        result(null, err);
+      } else {
+        console.log("Competitor created successfully");
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 // update competitor
