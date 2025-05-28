@@ -1,16 +1,18 @@
 require('dotenv').config()
 const mysql = require('mysql2')
-
-const dbConn = mysql.createConnection(process.env.DATABASE_URL)
-
 // const mysql = require("mysql");
 
-// const dbConn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "tournament",
-// });
+let dbConn;
+if (process.env.DATABASE_URL) {
+  dbConn = mysql.createConnection(process.env.DATABASE_URL)
+} else {
+  dbConn = mysql.createConnection({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+  });
+}
 
 dbConn.connect(function (error) {
   if (error) throw error;
